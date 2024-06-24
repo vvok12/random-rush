@@ -9,3 +9,7 @@ edition = "2021"
 axum = "0.7.5"
 serde = "1.0.203"
 tokio = { version="1.38.0", features = ["rt", "macros"] }
+
+[[bin]]
+name="random-rush-server"
+path="rust-src/main.rs"
