@@ -8,3 +8,6 @@ use this ID during testing when you have to create any shared resources
 # how to start server
 cargo run <br />
 open http://localhost:3000/ in browser
+
+# how to generate bindings
+cargo test

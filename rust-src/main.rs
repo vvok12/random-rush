@@ -3,6 +3,8 @@ use axum::{
     Router,
 };
 
+mod api;
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     // build our application with a single route
