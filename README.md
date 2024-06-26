@@ -7,9 +7,12 @@ use this ID during testing when you have to create any external resources
 
 # how to run all together
 docker build -t random-rush-dev . &&
-docker run -p 3080:3000 -it --rm --name random-rush-dev random-rush-dev
+docker run -p 3080:3000 -d --rm --name random-rush-dev random-rush-dev
 
 open http://localhost:3080/
+
+
+docker stop random-rush-dev
 
 # how to start server
 cargo run <br />
