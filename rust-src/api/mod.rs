@@ -10,9 +10,7 @@ pub struct UserId(Uuid);
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub struct Unit {
-    id: Colour
-}
+pub struct UnitId(Colour);
 
 #[derive(TS)]
 #[ts(export)]
@@ -31,8 +29,7 @@ pub enum Colour {
 pub enum ActionTarget {
     Any,
     Last,
-    #[serde(untagged)]
-    Exact(Unit),
+    Unit(UnitId),
 }
 
 #[derive(TS)]
@@ -72,7 +69,7 @@ pub struct Board {
 #[serde(rename_all = "camelCase")]
 pub struct BoardCell
 {
-    units_here: Vec<Unit>,
+    units: Vec<UnitId>,
 }
 
 #[derive(TS)]
