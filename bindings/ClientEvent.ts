@@ -3,4 +3,4 @@ import type { BoardId } from "./BoardId";
 import type { UserHandId } from "./UserHandId";
 import type { UserMove } from "./UserMove";
 
-export type ClientEvent = "ReciveUserId" | "ReciveBoardId" | { "LoadBoard": BoardId } | { "LoadHand": UserHandId } | { "MakeMove": UserMove };
+export type ClientEvent = "ReciveUserId" | "RecivePlayroomId" | { "LoadBoard": BoardId } | { "LoadHand": UserHandId } | { "MakeMove": UserMove };

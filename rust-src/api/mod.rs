@@ -57,6 +57,11 @@ pub struct BoardId(Uuid);
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
+pub struct PlayroomId(BoardId);
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
 pub struct Board {
     id: BoardId,
     users_connected: Vec<UserId>,
@@ -104,7 +109,7 @@ pub struct UserHand
 #[derive(Serialize, Deserialize)]
 pub enum ClientEvent {
     ReciveUserId,
-    ReciveBoardId,
+    RecivePlayroomId,
     LoadBoard(BoardId),
     LoadHand(UserHandId),
     MakeMove(UserMove),
@@ -115,7 +120,7 @@ pub enum ClientEvent {
 #[derive(Serialize, Deserialize)]
 pub enum ServerEvent {
     SendUserId(UserId),
-    SendBoardId(BoardId),
+    SendPlayroomId(PlayroomId),
     SendBoard(Board),
     SendUserHand(UserHand),
     ConfirmMove(UserMove),
