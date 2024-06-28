@@ -75,16 +75,6 @@ pub struct BoardCell
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub enum ClientEvent {
-    ReciveUserId,
-    LoadBoard(BoardId),
-    LoadHand(UserId),
-    MakeMove(UserMove),
-}
-
-#[derive(TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize)]
 pub struct UserMove
 {
     user: UserHandId,
@@ -112,8 +102,20 @@ pub struct UserHand
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
+pub enum ClientEvent {
+    ReciveUserId,
+    ReciveBoardId,
+    LoadBoard(BoardId),
+    LoadHand(UserHandId),
+    MakeMove(UserMove),
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
 pub enum ServerEvent {
     SendUserId(UserId),
+    SendBoardId(BoardId),
     SendBoard(Board),
     SendUserHand(UserHand),
     ConfirmMove(UserMove),
