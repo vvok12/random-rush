@@ -1,5 +1,11 @@
 use ts_rs::TS;
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub struct UserId(Uuid);
 
 #[derive(TS)]
 #[ts(export)]
@@ -49,7 +55,14 @@ pub struct Action
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
+pub struct BoardId(Uuid);
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
 pub struct Board {
+    id: BoardId,
+    users_connected: Vec<UserId>,
     cells: [BoardCell; 10]
 }
 
@@ -59,5 +72,53 @@ pub struct Board {
 #[serde(rename_all = "camelCase")]
 pub struct BoardCell
 {
-    units_here: Vec<Unit>
+    units_here: Vec<Unit>,
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub enum ClientEvent {
+    ReciveUserId,
+    LoadBoard(BoardId),
+    LoadHand(UserId),
+    MakeMove(UserMove),
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub struct UserMove
+{
+    user: UserHandId,
+    action: Action,
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub struct UserHandId
+{
+    user: UserId,
+    board: BoardId,
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub struct UserHand
+{
+    id: UserHandId,
+    available_actions: Vec<Action>,
+}
+
+#[derive(TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize)]
+pub enum ServerEvent {
+    SendUserId(UserId),
+    SendBoard(Board),
+    SendUserHand(UserHand),
+    ConfirmMove(UserMove),
+    Error(String)
 }
