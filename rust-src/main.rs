@@ -5,7 +5,7 @@ use axum::{
         State, 
         WebSocketUpgrade
     },
-    response::Response, 
+    response::{Html, Response}, 
     routing::get, 
     Router
 };
@@ -30,7 +30,7 @@ async fn main() {
     };
     
     let app = Router::new()
-        .route("/", get(|| async { "use /playroom-ws endpoint to connect to web socket" }))
+        .route("/", get(|| async {  Html(include_str!("index.html")) }))
         .route("/playroom-ws", get(handler)).with_state(app);
 
     // run our app with hyper, listening globally on port 3000
