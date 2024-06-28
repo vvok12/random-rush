@@ -124,5 +124,5 @@ pub enum ServerEvent {
     SendBoard(Board),
     SendUserHand(UserHand),
     ConfirmMove(UserMove),
-    Error(String)
+    ServerError(String)
 }

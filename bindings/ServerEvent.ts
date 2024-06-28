@@ -5,4 +5,4 @@ import type { UserHand } from "./UserHand";
 import type { UserId } from "./UserId";
 import type { UserMove } from "./UserMove";
 
-export type ServerEvent = { "SendUserId": UserId } | { "SendPlayroomId": PlayroomId } | { "SendBoard": Board } | { "SendUserHand": UserHand } | { "ConfirmMove": UserMove } | { "Error": string };
+export type ServerEvent = { "SendUserId": UserId } | { "SendPlayroomId": PlayroomId } | { "SendBoard": Board } | { "SendUserHand": UserHand } | { "ConfirmMove": UserMove } | { "ServerError": string };
