@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use ts_rs::TS;
 use serde::{Serialize, Deserialize};
 
@@ -24,7 +22,7 @@ pub enum Colour {
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub enum CardTarget {
+pub enum ActionTarget {
     Any,
     Last,
     #[serde(untagged)]
@@ -34,7 +32,7 @@ pub enum CardTarget {
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub enum CardAction {
+pub enum ActionEffect {
     MoveForward(u8),
     MoveBackward,
 }
@@ -42,20 +40,17 @@ pub enum CardAction {
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub struct Card
+pub struct Action
 {
-    target: CardTarget, 
-    action: CardAction
+    target: ActionTarget, 
+    effect: ActionEffect
 }
-
 
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Board {
-    cells: Vec<BoardCell>,
-    //unit_map: HashMap<Unit, BoardCell>
+    cells: [BoardCell; 10]
 }
 
 #[derive(TS)]
