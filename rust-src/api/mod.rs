@@ -5,16 +5,16 @@ use uuid::Uuid;
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub struct UserId(Uuid);
+pub struct UserId(pub Uuid);
 
 #[derive(TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct UnitId(Colour);
 
 #[derive(TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Colour {
     Red,
     Green,
@@ -52,29 +52,29 @@ pub struct Action
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub struct BoardId(Uuid);
+pub struct BoardId(pub Uuid);
 
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
-pub struct PlayroomId(BoardId);
+pub struct PlayroomId(pub BoardId);
 
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
 pub struct Board {
-    id: BoardId,
-    users_connected: Vec<UserId>,
-    cells: [BoardCell; 10]
+    pub id: BoardId,
+    pub users_connected: Vec<UserId>,
+    pub cells: [BoardCell; 10]
 }
 
 #[derive(TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct BoardCell
 {
-    units: Vec<UnitId>,
+    pub units: Vec<UnitId>,
 }
 
 #[derive(TS)]
@@ -107,6 +107,7 @@ pub struct UserHand
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
+#[serde(tag = "event", content="data")]
 pub enum ClientEvent {
     ReciveUserId,
     RecivePlayroomId,
@@ -118,6 +119,7 @@ pub enum ClientEvent {
 #[derive(TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize)]
+#[serde(tag = "event", content = "data")]
 pub enum ServerEvent {
     SendUserId(UserId),
     SendPlayroomId(PlayroomId),
