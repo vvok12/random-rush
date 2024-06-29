@@ -24,24 +24,28 @@ mod processor;
 struct AppState {
     input_tx: Arc<Mutex<Sender<PlayroomProcessingCtx>>>,
     output_tx: Arc<Mutex<Sender<PlayroomProcessingCtx>>>,
+    playroom_id: Uuid,
 }
 
-#[tokio::main(flavor = "current_thread")]
+#[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() {
-    let (processor_tx, processor_rx) = broadcast::channel(32);
+    let (processor_tx, _) = broadcast::channel(32);
     let (output_tx, _) = broadcast::channel::<PlayroomProcessingCtx>(32);
     let app = AppState {
         input_tx: Arc::new(Mutex::new(processor_tx)),
-        output_tx: Arc::new(Mutex::new(output_tx))
+        output_tx: Arc::new(Mutex::new(output_tx)),
+        playroom_id: Uuid::new_v4(),
     };
     
+    let processor_rx = app.input_tx.lock().await.subscribe();
     let output_tx = app.output_tx.clone();
     tokio::spawn(async move {
-        processor::processor(processor_rx, output_tx)
+        processor::processor(processor_rx, output_tx).await
     });
 
     let app = Router::new()
         .route("/", get(|| async {  Html(include_str!("index.html")) }))
+        .route("/socket-test", get(|| async {  Html(include_str!("socket-test.html")) }))
         .route("/playroom-ws", get(handler)).with_state(app);
 
     // run our app with hyper, listening globally on port 3000
@@ -72,7 +76,7 @@ async fn handle_socket(
         });
     }
 
-    recv_client_input(ws_id, ws_bounce_tx, ws_rx, app.input_tx).await;
+    recv_client_input(ws_id, ws_bounce_tx, ws_rx, app.input_tx, app.playroom_id).await;
 }
 
 async fn recv_playroom_output(
@@ -108,6 +112,7 @@ async fn recv_client_input(
     client_tx: Arc<Mutex<SplitSink<WebSocket, Message>>>,
     mut client_rx: SplitStream<WebSocket>,
     playroom_tx: Arc<Mutex<Sender<PlayroomProcessingCtx>>>,
+    playroom_id: Uuid,
 ) {
     while let Some(Ok(msg)) = client_rx.next().await {
         if matches!(msg, Message::Close(_)) {
@@ -115,8 +120,10 @@ async fn recv_client_input(
         }
 
         if let Message::Text(m) = msg {
-            let ctx = PlayroomProcessingCtx::new(m, websocket_id);
-            playroom_tx.lock().await.send(ctx).unwrap();
+            let ctx = PlayroomProcessingCtx::new(m, websocket_id, playroom_id);
+            let sender = playroom_tx.lock().await;
+            let send_res = sender.send(ctx);
+            send_res.unwrap();
             continue;
         }
 
