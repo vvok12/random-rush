@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub(crate) enum ProcessingError {
     SerdeError(serde_json::Error),
-    PostgresError(tokio_postgres::Error),
+    PostgresError(sqlx::Error),
     NotImplemented,
 }
 
@@ -11,8 +11,8 @@ impl From<serde_json::Error> for ProcessingError {
     }
 }
 
-impl From<tokio_postgres::Error> for ProcessingError {
-    fn from(value: tokio_postgres::Error) -> Self {
+impl From<sqlx::Error> for ProcessingError {
+    fn from(value: sqlx::Error) -> Self {
         ProcessingError::PostgresError(value)
     }
 }

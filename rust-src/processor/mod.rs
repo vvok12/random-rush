@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use processing_error::ProcessingError;
+use sqlx::postgres::PgPoolOptions;
 use tokio::sync::{broadcast::{Receiver, Sender}, Mutex};
 use tokio_postgres::NoTls;
 use uuid::Uuid;
@@ -60,9 +61,18 @@ async fn processor_flow(ctx: &mut PlayroomProcessingCtx) -> Result<String, Proce
 }
 
 async fn process_event(client_event: ClientEvent, ctx: &PlayroomProcessingCtx) -> Result<ServerEvent, ProcessingError> {
-
-    let (pg_client, pg_connection) =
-        tokio_postgres::connect("postgresql://admin:password123@localhost:6500/random-rush-db?schema=public", NoTls).await?;
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect("postgresql://admin:password123@localhost:6500/random-rush-db?schema=public")
+        .await?;
+    
+    /* 
+    let res = sqlx::query("SELECT * FROM table").fetch(&pool).await?;
+    while let Some(row) = rows.try_next().await? {
+        // map the row into a user-defined domain type
+        let email: &str = row.try_get("email")?;
+    }
+    */
 
     match client_event {
         ClientEvent::ReciveUserId => recive_user_id(ctx),
