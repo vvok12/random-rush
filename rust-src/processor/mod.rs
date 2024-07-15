@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use processing_error::ProcessingError;
 use tokio::sync::{broadcast::{Receiver, Sender}, Mutex};
+use tokio_postgres::NoTls;
 use uuid::Uuid;
 
 use crate::api::{self, Board, BoardCell, ClientEvent, ServerEvent, UserId};
@@ -44,21 +45,25 @@ pub(crate) async fn processor(mut rx: Receiver<PlayroomProcessingCtx>, tx: Arc<M
 
 async fn processor_impl(ctx: &mut PlayroomProcessingCtx) {
     ctx.output_socket_id = Some(ctx.input_socket_id);
-    match processor_flow(ctx) {
+    match processor_flow(ctx).await {
         Ok(s) => ctx.raw_output = Some(s),
         Err(e) => println!("processor_impl ran into an error:{:?} {:?}", e, ctx)
     }
 }
 
-fn processor_flow(ctx: &mut PlayroomProcessingCtx) -> Result<String, ProcessingError>
+async fn processor_flow(ctx: &mut PlayroomProcessingCtx) -> Result<String, ProcessingError>
 {
     let ce = serde_json::from_str::<ClientEvent>(&ctx.raw_input)?;
-    let se = process_event(ce, &ctx)?;
+    let se = process_event(ce, &ctx).await?;
     let res = serde_json::to_string(&se)?;
     Ok(res)
 }
 
-fn process_event(client_event: ClientEvent, ctx: &PlayroomProcessingCtx) -> Result<ServerEvent, ProcessingError> {
+async fn process_event(client_event: ClientEvent, ctx: &PlayroomProcessingCtx) -> Result<ServerEvent, ProcessingError> {
+
+    let (pg_client, pg_connection) =
+        tokio_postgres::connect("postgresql://admin:password123@localhost:6500/random-rush-db?schema=public", NoTls).await?;
+
     match client_event {
         ClientEvent::ReciveUserId => recive_user_id(ctx),
         ClientEvent::RecivePlayroomId => recive_playroom_id(ctx),
