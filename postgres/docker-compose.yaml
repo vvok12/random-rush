@@ -19,5 +19,7 @@ services:
   server:
     image: random-rush-server/compose
     build: ..
+    ports:
+      - "4080:3000"
 volumes:
   progresDB:
